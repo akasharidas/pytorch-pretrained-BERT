@@ -30,6 +30,7 @@ import shutil
 import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
+from torch.utils import checkpoint
 
 from .file_utils import cached_path
 
@@ -329,7 +330,7 @@ class BertEncoder(nn.Module):
         all_encoder_layers = []
         for i, layer_module in enumerate(self.layer):
             if i in self.ckpts:
-                hidden_states = torch.utils.checkpoint.checkpoint(layer_module, hidden_states, attention_mask)
+                hidden_states = checkpoint.checkpoint(layer_module, hidden_states, attention_mask)
             else:
                 hidden_states = layer_module(hidden_states, attention_mask)
             if output_all_encoded_layers:
